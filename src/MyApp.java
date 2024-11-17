@@ -40,7 +40,7 @@ public class MyApp {
     public static void showMenu(JFrame frame, Connection conn) {
         // Create the menu bar
         JMenuBar menuBar = new JMenuBar();
-        JMenu dbMenu = new JMenu("Database");
+        JMenu dbMenu = new JMenu("Menu");
         JMenuItem createTablesItem = new JMenuItem("Create Tables");
         JMenuItem dropTablesItem = new JMenuItem("Drop Tables");
         JMenuItem populateTablesItem = new JMenuItem("Populate Tables");
