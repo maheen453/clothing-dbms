@@ -194,6 +194,8 @@ public class MyApp {
         }
     }
 
+
+
     // Method to populate tables 
     public static void populateTables(Connection conn) {
         String insertDataSQL = "INSERT INTO Customers (CustomerID, Name, Email) " +
@@ -206,40 +208,104 @@ public class MyApp {
         }
     }
 
+
+
     // Method to query tables and display results
-public static void queryTables(Connection conn) {
-    String querySQL = "SELECT * FROM Customer";  
-    try (Statement stmt = conn.createStatement();
-         ResultSet rs = stmt.executeQuery(querySQL)) {
-
-        // StringBuilder to format the results
-        StringBuilder results = new StringBuilder("Customer Data:\n");
-
-        // Iterate through the result set
-        while (rs.next()) {
-            String id = rs.getString("Customer_ID");
-            String name = rs.getString("Customer_Name");
-            String address = rs.getString("Customer_Address");
-            String email = rs.getString("Customer_Email");
-            results.append("ID: " + id + ", Name: " + name + ", Address: " + address + ", Email: " + email + "\n");
-        }
-
-        // Display the results in a message box
-        JOptionPane.showMessageDialog(null, results.toString());
-
-    } catch (SQLException e) {
-        e.printStackTrace();  // You can display this error more gracefully in the UI if needed
-    } finally {
-        try {
-            // Ensure the connection is closed properly
-            if (conn != null && !conn.isClosed()) {
-                conn.close();
+    public static void queryTables(Connection conn) {
+        try (Statement stmt = conn.createStatement()) {
+            // query the customer table
+            String customerQuerySQL = "SELECT * FROM Customer";
+            ResultSet rs = stmt.executeQuery(customerQuerySQL);
+            StringBuilder results = new StringBuilder("Customer Data:\n");
+            while (rs.next()) {
+                String cid = rs.getString("Customer_ID");
+                String name = rs.getString("Customer_Name");
+                String address = rs.getString("Customer_Address");
+                String email = rs.getString("Customer_Email");
+                results.append("ID: ").append(cid).append(", Name: ").append(name)
+                    .append(", Address: ").append(address).append(", Email: ").append(email).append("\n");
             }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
+            // query the supplier table
+            String supplierQuerySQL = "SELECT * FROM Supplier";
+            ResultSet srs = stmt.executeQuery(supplierQuerySQL);
+            results.append("\nSupplier Data:\n");
+            while (srs.next()) {
+                String sid = srs.getString("Supplier_ID");
+                String sname = srs.getString("Supplier_Name");
+                String saddress = srs.getString("Supplier_Address");
+                String snumber = srs.getString("Phone_Number");
+                results.append("Supplier ID: ").append(sid).append(", Supplier Name: ").append(sname)
+                    .append(", Supplier Address: ").append(saddress).append(", Phone Number: ").append(snumber).append("\n");
+            }
+            // query the product table
+            String productQuerySQL = "SELECT * FROM Product";
+            ResultSet prs = stmt.executeQuery(productQuerySQL);
+            results.append("\nProduct Data:\n");
+            while (prs.next()) {
+                String pid = prs.getString("Product_ID");
+                String pname = prs.getString("Product_Name");
+                String sid = prs.getString("Supplier_ID");
+                String size = prs.getString("Sizing");
+                int stock = prs.getInt("Stock");
+                double price = prs.getDouble("Price");
+                results.append("Product ID: ").append(pid).append(", Product Name: ").append(pname)
+                    .append(", Supplier ID: ").append(sid).append(", Size: ").append(size)
+                    .append(", Stock: ").append(stock).append(", Price: ").append(price).append("\n");
+            }
+            // query the orders table
+            String ordersQuerySQL = "SELECT * FROM Orders";
+            ResultSet ors = stmt.executeQuery(ordersQuerySQL);
+            results.append("\nOrder Data:\n");
+            while (ors.next()) {
+                String oid = ors.getString("Order_ID");
+                String cid = ors.getString("Customer_ID");
+                java.sql.Date odate = ors.getDate("Order_Date");
+                Double total = ors.getDouble("Order_Total");
+                results.append("Order ID: ").append(oid).append(", Customer ID: ").append(cid)
+                    .append(", Order Date: ").append(odate).append(", Order Total: ").append(total).append("\n");
+            }
+            // query the order items table
+            String orderItemsQuerySQL = "SELECT * FROM Order_Items";
+            ResultSet oirs = stmt.executeQuery(orderItemsQuerySQL);
+            results.append("\nOrder Items Data:\n");
+            while (oirs.next()) {
+                String oid = oirs.getString("Order_ID");
+                String pid = oirs.getString("Product_ID");
+                int quantity = oirs.getInt("Product_Quantity");
+                results.append("Order ID: ").append(oid).append(", Product ID: ").append(pid).append(", Product Quantity: ").append(quantity).append("\n");
+            }
+            // query the product details table
+            String productDetailsQuerySQL = "SELECT * FROM Product_Details";
+            ResultSet pdrs = stmt.executeQuery(productDetailsQuerySQL);
+            results.append("\nProduct Details Data:\n");
+            while (pdrs.next()) {
+                String pid = pdrs.getString("Product_ID");
+                String pname = pdrs.getString("Product_Name");
+                String sid = pdrs.getString("Supplier_ID");
+                results.append("Product ID: ").append(pid).append(", Product Name: ").append(pname).append(", Supplier ID: ").append(sid).append("\n");
+            }
+
+
+
+
+            // display the results in a message box
+            JOptionPane.showMessageDialog(null, results.toString());
+
+        } catch (SQLException e) {
+            e.printStackTrace();  // You can display this error more gracefully in the UI if needed
+        } finally {
+            try {
+                if (conn != null && !conn.isClosed()) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
         }
+
     }
-}
+
+
 
 class DatabaseConnector {
     public static Connection connect() {
