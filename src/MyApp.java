@@ -47,7 +47,7 @@ public class MyApp {
         JMenuItem queryTablesItem = new JMenuItem("Query Tables");
         JMenuItem exitItem = new JMenuItem("Exit");
 
-        // Add menu items to the menu
+        // add items to the menu
         dbMenu.add(createTablesItem);
         dbMenu.add(dropTablesItem);
         dbMenu.add(populateTablesItem);
@@ -55,7 +55,6 @@ public class MyApp {
         dbMenu.add(exitItem);
 
         menuBar.add(dbMenu);
-
         frame.setJMenuBar(menuBar);
 
         // Action listener for "Create Tables"
@@ -65,7 +64,6 @@ public class MyApp {
                 createTables(conn);
             }
         });
-
         // Action listener for "Drop Tables"
         dropTablesItem.addActionListener(new ActionListener() {
             @Override
@@ -73,7 +71,6 @@ public class MyApp {
                 dropTables(conn);
             }
         });
-
         // Action listener for "Populate Tables"
         populateTablesItem.addActionListener(new ActionListener() {
             @Override
@@ -81,7 +78,6 @@ public class MyApp {
                 populateTables(conn);
             }
         });
-
         // Action listener for "Query Tables"
         queryTablesItem.addActionListener(new ActionListener() {
             @Override
@@ -89,22 +85,22 @@ public class MyApp {
                 queryTables(conn);
             }
         });
-
         // Action listener for "Exit"
         exitItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                System.exit(0); // Exit the application
+                System.exit(0); 
             }
         });
 
-        // Force UI to update after adding menu
+        // update ui after adding menu
         SwingUtilities.updateComponentTreeUI(frame);
     }
 
+
+
     // Method to create tables
     public static void createTables(Connection conn) {
-        // Create SQL statements for all the tables
         String createCustomerTableSQL = "CREATE TABLE Customer (" +
                                         "Customer_ID VARCHAR2(10) PRIMARY KEY, " +
                                         "Customer_Name VARCHAR2(100) NOT NULL, " +
@@ -140,31 +136,31 @@ public class MyApp {
                                       ")";
     
         String createOrderItemsTableSQL = "CREATE TABLE Order_Items (" +
-                                      "Order_ID NUMBER, " +
-                                      "Product_ID NUMBER, " +
+                                      "Order_ID VARCHAR2(10), " +
+                                      "Product_ID VARCHAR2(10), " +
                                       "Product_Quantity NUMBER, " +
                                       "PRIMARY KEY (Order_ID, Product_ID), " +
                                       "FOREIGN KEY (Order_ID) REFERENCES Orders(Order_ID), " +
                                       "FOREIGN KEY (Product_ID) REFERENCES Product(Product_ID)" +
                                       ")";
 
-    String createProductDetailsTableSQL = "CREATE TABLE Product_Details (" +
-                                         "Product_ID NUMBER PRIMARY KEY, " +
+        String createProductDetailsTableSQL = "CREATE TABLE Product_Details (" +
+                                         "Product_ID VARCHAR2(10) PRIMARY KEY, " +
                                          "Product_Name VARCHAR2(100), " +
                                          "Supplier_ID VARCHAR2(10), " +
                                          "FOREIGN KEY (Supplier_ID) REFERENCES Supplier(Supplier_ID)" +
                                          ")";
 
-    String[] sqlStatements = {
-        createCustomerTableSQL,
-        createSupplierTableSQL,
-        createProductTableSQL,
-        createOrdersTableSQL,
-        createOrderItemsTableSQL,
-        createProductDetailsTableSQL
-    };
+        String[] sqlStatements = {
+            createCustomerTableSQL,
+            createSupplierTableSQL,
+            createProductTableSQL,
+            createOrdersTableSQL,
+            createOrderItemsTableSQL,
+            createProductDetailsTableSQL
+        };
 
-        // Iterate through array and execute each statement
+        // iterate through array and execute each statement
         for (String sql : sqlStatements) {
             try (Statement stmt = conn.createStatement()) {
                 stmt.executeUpdate(sql);
@@ -185,26 +181,127 @@ public class MyApp {
 
     // Method to drop tables
     public static void dropTables(Connection conn) {
-        String dropTableSQL = "DROP TABLE IF EXISTS Customers";
-        try (Statement stmt = conn.createStatement()) {
-            stmt.executeUpdate(dropTableSQL);
-            JOptionPane.showMessageDialog(null, "Table dropped successfully.");
-        } catch (SQLException e) {
-            e.printStackTrace();
+        String dropCustomerTableSQL = "DROP TABLE Customer CASCADE CONSTRAINTS"; //drop table that has foreign key
+        String dropSupplierTableSQL = "DROP TABLE Supplier CASCADE CONSTRAINTS";
+        String dropProductTableSQL = "DROP TABLE Product CASCADE CONSTRAINTS";
+        String dropOrdersTableSQL = "DROP TABLE Orders CASCADE CONSTRAINTS";
+        String dropOrderItemsTableSQL = "DROP TABLE Order_Items CASCADE CONSTRAINTS";
+        String dropProductDetailsTableSQL = "DROP TABLE Product_Details CASCADE CONSTRAINTS";
+
+        String[] sqlStatements = {
+            dropCustomerTableSQL,
+            dropSupplierTableSQL,
+            dropProductTableSQL,
+            dropOrdersTableSQL,
+            dropOrderItemsTableSQL,
+            dropProductDetailsTableSQL
+        };
+
+        // iterate through the array and execute each statement
+        for (String sql : sqlStatements) {
+            try (Statement stmt = conn.createStatement()) {
+                stmt.executeUpdate(sql);
+                System.out.println("Table dropped successfully: " + sql.split(" ")[2]);
+            } catch (SQLException e) {
+                if (e.getErrorCode() == 942) {  // oracle error code
+                    // case where the table doesn't exist
+                    System.out.println("Table does not exist: " + sql.split(" ")[2]);
+                } else {
+                    e.printStackTrace();
+                    System.out.println("Error dropping table: " + sql.split(" ")[2]);
+                }
+            }
         }
     }
 
 
 
-    // Method to populate tables 
+    // Method to populate tables
     public static void populateTables(Connection conn) {
-        String insertDataSQL = "INSERT INTO Customers (CustomerID, Name, Email) " +
-                               "VALUES (1, 'John Doe', 'johndoe@example.com')";
         try (Statement stmt = conn.createStatement()) {
-            stmt.executeUpdate(insertDataSQL);
-            JOptionPane.showMessageDialog(null, "Table populated with data.");
-        } catch (SQLException e) {
+            // customer table
+            stmt.executeUpdate("INSERT INTO Customer (Customer_ID, Customer_Name, Customer_Address, Customer_Email) " +
+                            "VALUES ('RJ123', 'Quandale Dingle', '4567 Albion Road, Rexdale, ON M9V 1T1', 'dingle123@gmail.com')");
+            stmt.executeUpdate("INSERT INTO Customer (Customer_ID, Customer_Name, Customer_Address, Customer_Email) " +
+                            "VALUES ('MP789', 'Mark Paul', '123 High Street, Hamilton, ON L8P 2N1', 'markb789@gmail.com')");
+            stmt.executeUpdate("INSERT INTO Customer (Customer_ID, Customer_Name, Customer_Address, Customer_Email) " +
+                            "VALUES ('LC984', 'Lily Carter', '90 Front Street, Ottawa, ON K1A 0B1', 'lilycarter@gmail.com')");
+                            stmt.executeUpdate("INSERT INTO Customer (Customer_ID, Customer_Name, Customer_Address, Customer_Email) " +
+                            "VALUES ('HA784', 'Hala Ali', '123 Maple Street, Peterborough, ON K9J 2X7', 'alihala@gmail.com')");                
+
+            // supplier table
+            stmt.executeUpdate("INSERT INTO Supplier (Supplier_ID, Supplier_Name, Supplier_Address, Phone_Number) " +
+                            "VALUES ('TMR123', 'Tas Industries', '123 King Street West, Suite 400, Toronto, ON M5H 1A1', '647-563-2349')");
+            stmt.executeUpdate("INSERT INTO Supplier (Supplier_ID, Supplier_Name, Supplier_Address, Phone_Number) " +
+                            "VALUES ('MRT456', 'Juli Textiles', '910 Bathurst Street, Unit 301, Toronto, ON M5R 3G2', '416-657-5738')");
+            stmt.executeUpdate("INSERT INTO Supplier (Supplier_ID, Supplier_Name, Supplier_Address, Phone_Number) " +
+                            "VALUES ('WST789', 'West Apparel', '222 Queen Street West, Toronto, ON M5V 3J3', '647-222-4567')");
+            stmt.executeUpdate("INSERT INTO Supplier (Supplier_ID, Supplier_Name, Supplier_Address, Phone_Number) " +
+                            "VALUES ('EAS012', 'East Clothiers', '890 Yonge Street, Toronto, ON M4W 2H2', '416-555-9012')");
+
+            // product table
+            stmt.executeUpdate("INSERT INTO Product (Product_ID, Product_Name, Supplier_ID, Sizing, Stock, Price) " +
+                            "VALUES ('SJ4573', 'Straight Fit Jeans', 'TMR123', 'S', 345, 50.00)");
+            stmt.executeUpdate("INSERT INTO Product (Product_ID, Product_Name, Supplier_ID, Sizing, Stock, Price) " +
+                            "VALUES ('AS489', 'Ankle Socks', 'MRT456', 'One Size', 300, 20.00)");
+            stmt.executeUpdate("INSERT INTO Product (Product_ID, Product_Name, Supplier_ID, Sizing, Stock, Price) " +
+                            "VALUES ('HJ765', 'Hoodie', 'WST789', 'M', 500, 75.00)");
+            stmt.executeUpdate("INSERT INTO Product (Product_ID, Product_Name, Supplier_ID, Sizing, Stock, Price) " +
+                            "VALUES ('TS987', 'T-Shirt', 'EAS012', 'L', 100, 25.00)");
+            stmt.executeUpdate("INSERT INTO Product (Product_ID, Product_Name, Supplier_ID, Sizing, Stock, Price) " +
+                            "VALUES ('CK903', 'Cargo Pants', 'EAS012', 'S', 450, 55.00)");
+
+            // orders table
+            stmt.executeUpdate("INSERT INTO Orders (Order_ID, Customer_ID, Order_Date, Order_Total) " +
+                            "VALUES ('MB567', 'MP789', TO_DATE('2024-09-20', 'YYYY-MM-DD'), 150.00)");
+            stmt.executeUpdate("INSERT INTO Orders (Order_ID, Customer_ID, Order_Date, Order_Total) " +
+                            "VALUES ('LC432', 'LC984', TO_DATE('2024-09-22', 'YYYY-MM-DD'), 75.00)");
+            stmt.executeUpdate("INSERT INTO Orders (Order_ID, Customer_ID, Order_Date, Order_Total) " +
+                            "VALUES ('HA982', 'HA784', TO_DATE('2024-09-25', 'YYYY-MM-DD'), 200.00)");
+            stmt.executeUpdate("INSERT INTO Orders (Order_ID, Customer_ID, Order_Date, Order_Total) " +
+                            "VALUES ('TJR476', 'RJ123', TO_DATE('2024-09-17', 'YYYY-MM-DD'), 120.00)");
+            stmt.executeUpdate("INSERT INTO Orders (Order_ID, Customer_ID, Order_Date, Order_Total) " +
+                            "VALUES ('RJ987', 'RJ123', TO_DATE('2024-09-28', 'YYYY-MM-DD'), 170.00)");
+
+            // order items table
+            stmt.executeUpdate("INSERT INTO Order_Items (Order_ID, Product_ID, Product_Quantity) " +
+                            "VALUES ('TJR476', 'SJ4573', 2)");
+            stmt.executeUpdate("INSERT INTO Order_Items (Order_ID, Product_ID, Product_Quantity) " +
+                            "VALUES ('MB567', 'HJ765', 1)");
+            stmt.executeUpdate("INSERT INTO Order_Items (Order_ID, Product_ID, Product_Quantity) " +
+                            "VALUES ('MB567', 'TS987', 2)");
+            stmt.executeUpdate("INSERT INTO Order_Items (Order_ID, Product_ID, Product_Quantity) " +
+                            "VALUES ('LC432', 'CK903', 3)");
+            stmt.executeUpdate("INSERT INTO Order_Items (Order_ID, Product_ID, Product_Quantity) " +
+                            "VALUES ('HA982', 'SJ4573', 4)");
+            stmt.executeUpdate("INSERT INTO Order_Items (Order_ID, Product_ID, Product_Quantity) " +
+                            "VALUES ('RJ987', 'SJ4573', 1)");  
+            stmt.executeUpdate("INSERT INTO Order_Items (Order_ID, Product_ID, Product_Quantity) " +
+                            "VALUES ('RJ987', 'AS489', 2)");
+
+            // product details table
+            stmt.executeUpdate("INSERT INTO Product_Details (Product_ID, Product_Name, Supplier_ID) " +
+            "VALUES ('SJ4573', 'Straight Fit Jeans', 'TMR123')");
+            stmt.executeUpdate("INSERT INTO Product_Details (Product_ID, Product_Name, Supplier_ID) " +
+            "VALUES ('AS489', 'Ankle Socks', 'MRT456')");
+            stmt.executeUpdate("INSERT INTO Product_Details (Product_ID, Product_Name, Supplier_ID) " +
+            "VALUES ('HJ765', 'Hoodie', 'WST789')");
+            stmt.executeUpdate("INSERT INTO Product_Details (Product_ID, Product_Name, Supplier_ID) " +
+            "VALUES ('TS987', 'T-Shirt', 'EAS012')");
+            stmt.executeUpdate("INSERT INTO Product_Details (Product_ID, Product_Name, Supplier_ID) " +
+            "VALUES ('CK903', 'Cargo Pants', 'EAS012')");
+
+            JOptionPane.showMessageDialog(null, "Tables populated successfully!");
+        }
+        catch (SQLException e) {
+        if (e.getErrorCode() == 1) {  //  error code for unique constraint violation
+            System.out.println("Unique constraint violation: A record with this value already exists.");
+        } else if (e.getErrorCode() == 1400) {  // cannot insert NULL value error code
+            System.out.println("Error: NULL values are not allowed in certain columns.");
+        } else {
             e.printStackTrace();
+            System.out.println("Error inserting data.");
+        }
         }
     }
 
@@ -271,7 +368,7 @@ public class MyApp {
             while (oirs.next()) {
                 String oid = oirs.getString("Order_ID");
                 String pid = oirs.getString("Product_ID");
-                int quantity = oirs.getInt("Product_Quantity");
+                Integer quantity = oirs.getInt("Product_Quantity");
                 results.append("Order ID: ").append(oid).append(", Product ID: ").append(pid).append(", Product Quantity: ").append(quantity).append("\n");
             }
             // query the product details table
@@ -284,16 +381,18 @@ public class MyApp {
                 String sid = pdrs.getString("Supplier_ID");
                 results.append("Product ID: ").append(pid).append(", Product Name: ").append(pname).append(", Supplier ID: ").append(sid).append("\n");
             }
-
-
-
-
             // display the results in a message box
-            JOptionPane.showMessageDialog(null, results.toString());
+            JTextArea textArea = new JTextArea(30, 50);
+            textArea.setText(results.toString());
+            textArea.setEditable(false);  
+            JScrollPane scrollPane = new JScrollPane(textArea);
+            JOptionPane.showMessageDialog(null, scrollPane, "Query Results", JOptionPane.INFORMATION_MESSAGE);
 
-        } catch (SQLException e) {
-            e.printStackTrace();  // You can display this error more gracefully in the UI if needed
-        } finally {
+        } 
+        catch (SQLException e) {
+            e.printStackTrace();
+        } 
+        finally {
             try {
                 if (conn != null && !conn.isClosed()) {
                     conn.close();
@@ -302,25 +401,24 @@ public class MyApp {
                 ex.printStackTrace();
             }
         }
-
     }
 
 
 
-class DatabaseConnector {
-    public static Connection connect() {
-        try {
-            String url = "jdbc:oracle:thin:@oracle.scs.ryerson.ca:1521:orcl";
-            String username = "m3qayyum";
-            String password = "11142622";
-            
-            Class.forName("oracle.jdbc.driver.OracleDriver");
-            Connection conn = DriverManager.getConnection(url, username, password);
-            return conn;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+    class DatabaseConnector {
+        public static Connection connect() {
+            try {
+                String url = "jdbc:oracle:thin:@oracle.scs.ryerson.ca:1521:orcl";
+                String username = "m3qayyum";
+                String password = "11142622";
+                
+                Class.forName("oracle.jdbc.driver.OracleDriver");
+                Connection conn = DriverManager.getConnection(url, username, password);
+                return conn;
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
         }
     }
-}
 }
