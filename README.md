@@ -1,18 +1,30 @@
+# Clothing DBMS (Database Management System)
+
+Clothing DBMS is a robust Java-based application designed for managing a clothing store’s database. It seamlessly integrates with Oracle SQL for database operations and features a user-friendly graphical interface (GUI) built with Java Swing, providing an intuitive experience for managing customers, suppliers, products, and orders.
+
+## Key Features
+
+- **Oracle SQL Integration**: Utilizes Oracle SQL for efficient database management and transactions.
+- **Database Operations**: Supports essential operations such as creating tables, dropping tables, inserting sample data, and executing custom queries.
+- **Java Swing GUI**: A responsive and intuitive Java Swing graphical interface for seamless interaction with the database.
+- **Data Management**: Manage customer, supplier, product, order, and order item data with ease.
+- **Extensibility**: Designed with scalability in mind, allowing for easy addition of new features or integrations.
+
+## Technologies Used
+
+- **Java (JDK 8 or higher)**: The core programming language used to build the application.
+- **Oracle SQL**: All database operations are powered by Oracle SQL for reliable and efficient data management.
+- **JDBC**: Java Database Connectivity (JDBC) is used to connect and interact with the Oracle database.
+- **Java Swing**: Provides a clean, user-friendly graphical interface for interacting with the database.
+
 ## Getting Started
 
-Welcome to the VS Code Java world. Here is a guideline to help you get started to write Java code in Visual Studio Code.
+### Prerequisites
 
-## Folder Structure
+To run this application, ensure you have the following installed:
 
-The workspace contains two folders by default, where:
+- Java Development Kit (JDK) 8 or higher
+- Oracle Database (or a compatible SQL database with minor adjustments)
+- JDBC driver for Oracle (or the corresponding driver for your database)
 
-- `src`: the folder to maintain sources
-- `lib`: the folder to maintain dependencies
 
-Meanwhile, the compiled output files will be generated in the `bin` folder by default.
-
-> If you want to customize the folder structure, open `.vscode/settings.json` and update the related settings there.
-
-## Dependency Management
-
-The `JAVA PROJECTS` view allows you to manage your dependencies. More details can be found [here](https://github.com/microsoft/vscode-java-dependency#manage-dependencies).
