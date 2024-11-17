@@ -24,7 +24,7 @@ Clothing DBMS is a robust Java-based application designed for managing a clothin
 To run this application, ensure you have the following installed:
 
 - Java Development Kit (JDK) 8 or higher
-- Oracle Database (or a compatible SQL database with minor adjustments)
-- JDBC driver for Oracle (or the corresponding driver for your database)
+- Oracle Database
+- JDBC driver for Oracle 
 
 
