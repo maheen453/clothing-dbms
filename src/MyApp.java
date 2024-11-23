@@ -21,11 +21,11 @@ public class MyApp {
         connectButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Connect to DB when button is clicked
+                // connect to DB when button is clicked
                 Connection conn = DatabaseConnector.connect();
                 if (conn != null) {
                     JOptionPane.showMessageDialog(frame, "Connected to Database!");
-                    // After successful connection, show the menu options
+                    // after successful connection, show the menu options
                     showMenu(frame, conn);
                 } else {
                     JOptionPane.showMessageDialog(frame, "Failed to connect to Database.");
@@ -44,48 +44,117 @@ public class MyApp {
         JMenuItem createTablesItem = new JMenuItem("Create Tables");
         JMenuItem dropTablesItem = new JMenuItem("Drop Tables");
         JMenuItem populateTablesItem = new JMenuItem("Populate Tables");
-        JMenuItem queryTablesItem = new JMenuItem("Query Tables");
+        JMenu queryTablesMenu = new JMenu("Query Tables");
         JMenuItem exitItem = new JMenuItem("Exit");
 
         // add items to the menu
         dbMenu.add(createTablesItem);
         dbMenu.add(dropTablesItem);
         dbMenu.add(populateTablesItem);
-        dbMenu.add(queryTablesItem);
+        dbMenu.add(queryTablesMenu);
         dbMenu.add(exitItem);
 
         menuBar.add(dbMenu);
         frame.setJMenuBar(menuBar);
 
-        // Action listener for "Create Tables"
+        // submenu for advanced queries
+        JMenuItem viewAllInfoItem = new JMenuItem("View All Information");
+        JMenuItem query1Item = new JMenuItem("1. Total Spent by Customers Above Average Order Total");
+        JMenuItem query2Item = new JMenuItem("2. Products Not Ordered");
+        JMenuItem query3Item = new JMenuItem("3. Customers Ordering from Specific Suppliers");
+        JMenuItem query4Item = new JMenuItem("4. Suppliers with No Products in Orders");
+        JMenuItem query5Item = new JMenuItem("5. Products with Stock Above Average");
+        JMenuItem query6Item = new JMenuItem("6. Orders with Multiple Products");
+
+        queryTablesMenu.add(viewAllInfoItem);
+        queryTablesMenu.add(query1Item);
+        queryTablesMenu.add(query2Item);
+        queryTablesMenu.add(query3Item);
+        queryTablesMenu.add(query4Item);
+        queryTablesMenu.add(query5Item);
+        queryTablesMenu.add(query6Item);
+
+        //  "Create Tables"
         createTablesItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 createTables(conn);
             }
         });
-        // Action listener for "Drop Tables"
+        //  "Drop Tables"
         dropTablesItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 dropTables(conn);
             }
         });
-        // Action listener for "Populate Tables"
+        //  "Populate Tables"
         populateTablesItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 populateTables(conn);
             }
         });
-        // Action listener for "Query Tables"
-        queryTablesItem.addActionListener(new ActionListener() {
+
+        //  "Query Tables"
+        // queryTablesItem.addActionListener(new ActionListener() {
+        //     @Override
+        //     public void actionPerformed(ActionEvent e) {
+        //         queryTables(conn);
+        //     }
+        // });
+
+        viewAllInfoItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                queryTables(conn);
+                queryTables(conn); // Calls the existing queryTables method
             }
         });
-        // Action listener for "Exit"
+        
+        // Advanced Query Listeners
+        query1Item.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                executeAdvancedQuery(conn, 1);
+            }
+        });
+
+        query2Item.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                executeAdvancedQuery(conn, 2);
+            }
+        });
+
+        query3Item.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                executeAdvancedQuery(conn, 3);
+            }
+        });
+
+        query4Item.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                executeAdvancedQuery(conn, 4);
+            }
+        });
+
+        query5Item.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                executeAdvancedQuery(conn, 5);
+            }
+        });
+
+        query6Item.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                executeAdvancedQuery(conn, 6);
+            }
+        });
+
+        // "Exit"
         exitItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -402,6 +471,111 @@ public class MyApp {
             }
         }
     }
+
+    public static void executeAdvancedQuery(Connection conn, int queryNumber) {
+        String sql = "";
+        StringBuilder results = new StringBuilder();
+
+        switch (queryNumber) {
+            case 1:
+                sql = "SELECT C.Customer_Name, SUM(O.Order_Total) AS Total_Spent " +
+                        "FROM Customer C " +
+                        "JOIN Orders O ON C.Customer_ID = O.Customer_ID " +
+                        "GROUP BY C.Customer_Name " +
+                        "HAVING SUM(O.Order_Total) > (SELECT AVG(Order_Total) FROM Orders)";
+                results.append("Customers with Total Spent Above Average Order Total:\n");
+                break;
+            case 2:
+                sql = "SELECT P.Product_Name " +
+                        "FROM Product P " +
+                        "WHERE NOT EXISTS (" +
+                        "SELECT OI.Product_ID FROM Order_Items OI WHERE OI.Product_ID = P.Product_ID)";
+                results.append("Products Not Ordered:\n");
+                break;
+            case 3:
+                sql = "SELECT C.Customer_Name " +
+                        "FROM Customer C " +
+                        "WHERE EXISTS (" +
+                        "SELECT 1 FROM Orders O " +
+                        "JOIN Order_Items OI ON O.Order_ID = OI.Order_ID " +
+                        "JOIN Product P ON OI.Product_ID = P.Product_ID " +
+                        "JOIN Supplier S ON P.Supplier_ID = S.Supplier_ID " +
+                        "WHERE C.Customer_ID = O.Customer_ID AND S.Supplier_Name = 'Tas Industries') " +
+                        "OR EXISTS (" +
+                        "SELECT 1 FROM Orders O " +
+                        "JOIN Order_Items OI ON O.Order_ID = OI.Order_ID " +
+                        "JOIN Product P ON OI.Product_ID = P.Product_ID " +
+                        "JOIN Supplier S ON P.Supplier_ID = S.Supplier_ID " +
+                        "WHERE C.Customer_ID = O.Customer_ID AND S.Supplier_Name = 'Juli Textiles')";
+                results.append("Customers Ordering from Specific Suppliers:\n");
+                break;
+            case 4:
+                sql = "SELECT S.Supplier_Name " +
+                        "FROM Supplier S " +
+                        "MINUS " +
+                        "SELECT S.Supplier_Name " +
+                        "FROM Supplier S " +
+                        "JOIN Product P ON S.Supplier_ID = P.Supplier_ID " +
+                        "JOIN Order_Items OI ON P.Product_ID = OI.Product_ID";
+                results.append("Suppliers with No Products in Orders:\n");
+                break;
+            case 5:
+                sql = "SELECT P.Product_Name, P.Stock " +
+                        "FROM Product P " +
+                        "GROUP BY P.Product_Name, P.Stock " +
+                        "HAVING P.Stock > (SELECT AVG(Stock) FROM Product)";
+                results.append("Products with Stock Above Average:\n");
+                break;
+            case 6:
+                sql = "SELECT C.Customer_Name, O.Order_ID, COUNT(DISTINCT OI.Product_ID) AS Product_Count " +
+                        "FROM Customer C " +
+                        "JOIN Orders O ON C.Customer_ID = O.Customer_ID " +
+                        "JOIN Order_Items OI ON O.Order_ID = OI.Order_ID " +
+                        "GROUP BY C.Customer_Name, O.Order_ID " +
+                        "HAVING COUNT(DISTINCT OI.Product_ID) > 1";
+                results.append("Orders with Multiple Products:\n");
+                break;
+        }
+
+        try (Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                switch (queryNumber) {
+                    case 1:
+                        results.append("Name: ").append(rs.getString("Customer_Name"))
+                                .append(", Total Spent: ").append(rs.getDouble("Total_Spent")).append("\n");
+                        break;
+                    case 2:
+                        results.append("Product Name: ").append(rs.getString("Product_Name")).append("\n");
+                        break;
+                    case 3:
+                        results.append("Customer Name: ").append(rs.getString("Customer_Name")).append("\n");
+                        break;
+                    case 4:
+                        results.append("Supplier Name: ").append(rs.getString("Supplier_Name")).append("\n");
+                        break;
+                    case 5:
+                        results.append("Product Name: ").append(rs.getString("Product_Name"))
+                                .append(", Stock: ").append(rs.getInt("Stock")).append("\n");
+                        break;
+                    case 6:
+                        results.append("Customer Name: ").append(rs.getString("Customer_Name"))
+                                .append(", Order ID: ").append(rs.getString("Order_ID"))
+                                .append(", Product Count: ").append(rs.getInt("Product_Count")).append("\n");
+                        break;
+                }
+            }
+
+            JTextArea textArea = new JTextArea(30, 50);
+            textArea.setText(results.toString());
+            textArea.setEditable(false);
+            JScrollPane scrollPane = new JScrollPane(textArea);
+            JOptionPane.showMessageDialog(null, scrollPane, "Query Results", JOptionPane.INFORMATION_MESSAGE);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Error executing query: " + e.getMessage(), "Query Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
 
 
 
